@@ -1,16 +1,20 @@
 import * as THREE from "three";
 
-export default function () {
-  const planeGeometry = new THREE.PlaneGeometry(28.2, 48.6);
-  //const planeTexture = useTexture("./textures/plane.jpg");
-  const planeMaterial = new THREE.MeshBasicMaterial({
-    color: "slategrey",
+export const Cube = function (color, x, y) {
+  const cubeGeometry = new THREE.BoxGeometry();
+  const cubeMaterial = new THREE.MeshBasicMaterial({
+    color: color,
     side: THREE.DoubleSide,
-    //map: planeTexture,
   });
-  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-  plane.receiveShadow = true;
-  plane.rotateZ(-0.5 * Math.PI);
-  plane.position.y = -0.82;
-  return plane;
-}
+  const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+  cube.receiveShadow = true;
+  cube.position.z = 0.7;
+  cube.position.x = x;
+  cube.position.y = y;
+
+  if (color == "yellow") {
+    cube.name = "farmer";
+  }
+
+  return cube;
+};

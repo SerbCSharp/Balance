@@ -1,17 +1,27 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import Meshs from "./meshs.js";
 import { DragControls } from "three/examples/jsm/controls/DragControls.js";
-import { Airplanes } from "./airplanes.js";
+import { Text } from "troika-three-text";
+import Plane from "./plane.js";
+import { Cube } from "./meshs.js";
 
 // initialize the scene
 const scene = new THREE.Scene();
 
 // add objects to the scene
-const meshs = Meshs();
-scene.add(meshs);
-const airplanes = Airplanes();
-scene.add(airplanes);
+const plane = Plane();
+scene.add(plane);
+
+const group = new THREE.Group();
+const yellowCube = Cube("yellow", -25.5, 7);
+group.add(yellowCube);
+const blueCube = Cube("blue", -25.5, 5);
+group.add(blueCube);
+const redCube = Cube("red", -25.5, 3);
+group.add(redCube);
+const greenCube = Cube("green", -25.5, 1);
+group.add(greenCube);
+scene.add(group);
 
 // initialize the camera
 const camera = new THREE.PerspectiveCamera(
@@ -36,24 +46,39 @@ const orbitControls = new OrbitControls(camera, canvas);
 orbitControls.enableDamping = true;
 
 // ---------------------------------------------------------------------
-
-const objects = [airplanes];
+const objects = [group];
 const controls = new DragControls(objects, camera, renderer.domElement);
+let x, y;
 
 controls.addEventListener("dragstart", function (event) {
   orbitControls.enabled = false;
-  //event.object.material.emissive.set(0xaaaaaa); // Подсветка объекта
+  x = event.object.position.x;
+  y = event.object.position.y;
 });
 
 controls.addEventListener("dragend", function (event) {
   orbitControls.enabled = true;
-  //event.object.material.emissive.set(0x000000); // Возвращаем исходный вид
+  console.log(event.object);
+
+  const cube = Cube(event.object.material.color, x, y);
+  group.add(cube);
+
+  event.object.material.color.multiplyScalar(0.1);
+  const myText = new Text();
+  event.object.add(myText);
+  myText.text = "20%";
+  myText.fontSize = 0.2;
+  myText.position.z = 0.6;
+  myText.color = "white";
+  myText.anchorX = "center";
+  myText.anchorY = "middle";
+
+  //console.log(event.object);
 });
 
 controls.addEventListener("drag", function (event) {
   event.object.position.z = 0.7;
 });
-
 // ---------------------------------------------------------------------
 
 // render the scene

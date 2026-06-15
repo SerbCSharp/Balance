@@ -1,13 +1,14 @@
 import * as THREE from "three";
 
-export const Airplanes = function () {
-  const planeGeometry = new THREE.BoxGeometry();
+export default function () {
+  const planeGeometry = new THREE.PlaneGeometry(28.2, 48.6);
   const planeMaterial = new THREE.MeshBasicMaterial({
-    color: "red",
+    color: "slategrey",
     side: THREE.DoubleSide,
   });
   const plane = new THREE.Mesh(planeGeometry, planeMaterial);
   plane.receiveShadow = true;
-  plane.position.z = 0.7;
+  plane.rotateZ(-0.5 * Math.PI);
+  plane.position.y = -0.82;
   return plane;
-};
+}
