@@ -9,17 +9,19 @@ import { Cube } from "./meshs.js";
 const scene = new THREE.Scene();
 
 // add objects to the scene
-const plane = Plane();
+const widthPlane = 28.2;
+const heightPlane = 48.6;
+const plane = Plane(widthPlane, heightPlane);
 scene.add(plane);
 
 const group = new THREE.Group();
-const yellowCube = Cube("yellow", -25.5, 7);
+const yellowCube = Cube("farmer", -26, 9);
 group.add(yellowCube);
-const blueCube = Cube("blue", -25.5, 5);
+const blueCube = Cube("bakery", -26, 6);
 group.add(blueCube);
-const redCube = Cube("red", -25.5, 3);
+const redCube = Cube("shop", -26, 3);
 group.add(redCube);
-const greenCube = Cube("green", -25.5, 1);
+const greenCube = Cube("house", -26, 0);
 group.add(greenCube);
 scene.add(group);
 
@@ -45,7 +47,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 const orbitControls = new OrbitControls(camera, canvas);
 orbitControls.enableDamping = true;
 
-// ---------------------------------------------------------------------
+// DragControls
 const objects = [group];
 const controls = new DragControls(objects, camera, renderer.domElement);
 let x, y;
@@ -58,28 +60,33 @@ controls.addEventListener("dragstart", function (event) {
 
 controls.addEventListener("dragend", function (event) {
   orbitControls.enabled = true;
-  console.log(event.object);
 
-  const cube = Cube(event.object.material.color, x, y);
+  let cube = Cube(event.object.name, x, y);
   group.add(cube);
 
-  event.object.material.color.multiplyScalar(0.1);
-  const myText = new Text();
-  event.object.add(myText);
-  myText.text = "20%";
-  myText.fontSize = 0.2;
-  myText.position.z = 0.6;
-  myText.color = "white";
-  myText.anchorX = "center";
-  myText.anchorY = "middle";
-
-  //console.log(event.object);
+  for (const child of group.children) {
+    if (
+      child.position.x > -heightPlane / 2 &&
+      child.position.x < heightPlane / 2 &&
+      child.position.y > -widthPlane / 2 &&
+      child.position.y < widthPlane / 2
+    ) {
+      let percent = percentCalculation(child.name);
+      let percentText = new Text();
+      child.add(percentText);
+      percentText.fontSize = 0.4;
+      percentText.position.z = 1.01;
+      percentText.color = "black";
+      percentText.anchorX = "center";
+      percentText.anchorY = "middle";
+      percentText.text = `${percent * 100}%`;
+    }
+  }
 });
 
 controls.addEventListener("drag", function (event) {
-  event.object.position.z = 0.7;
+  event.object.position.z = 1.1;
 });
-// ---------------------------------------------------------------------
 
 // render the scene
 const renderloop = () => {
@@ -95,3 +102,8 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+const percentCalculation = (sector) => {
+  if (sector == "house") return 0.2;
+  else return 0.7;
+};
