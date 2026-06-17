@@ -1,29 +1,16 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { DragControls } from "three/examples/jsm/controls/DragControls.js";
-import { Text } from "troika-three-text";
-import Plane from "./plane.js";
-import { Cube } from "./meshs.js";
+import { Plane, PrimaryGroup } from "./meshs.js";
+import { Drag } from "./events.js";
 
 // initialize the scene
 const scene = new THREE.Scene();
 
 // add objects to the scene
-const widthPlane = 28.2;
-const heightPlane = 48.6;
-const plane = Plane(widthPlane, heightPlane);
+const plane = Plane();
 scene.add(plane);
-
-const group = new THREE.Group();
-const yellowCube = Cube("farmer", -26, 9);
-group.add(yellowCube);
-const blueCube = Cube("bakery", -26, 6);
-group.add(blueCube);
-const redCube = Cube("shop", -26, 3);
-group.add(redCube);
-const greenCube = Cube("house", -26, 0);
-group.add(greenCube);
-scene.add(group);
+const primaryGroup = PrimaryGroup();
+scene.add(primaryGroup);
 
 // initialize the camera
 const camera = new THREE.PerspectiveCamera(
@@ -48,45 +35,7 @@ const orbitControls = new OrbitControls(camera, canvas);
 orbitControls.enableDamping = true;
 
 // DragControls
-const objects = [group];
-const controls = new DragControls(objects, camera, renderer.domElement);
-let x, y;
-
-controls.addEventListener("dragstart", function (event) {
-  orbitControls.enabled = false;
-  x = event.object.position.x;
-  y = event.object.position.y;
-});
-
-controls.addEventListener("dragend", function (event) {
-  orbitControls.enabled = true;
-
-  let cube = Cube(event.object.name, x, y);
-  group.add(cube);
-
-  for (const child of group.children) {
-    if (
-      child.position.x > -heightPlane / 2 &&
-      child.position.x < heightPlane / 2 &&
-      child.position.y > -widthPlane / 2 &&
-      child.position.y < widthPlane / 2
-    ) {
-      let percent = percentCalculation(child.name);
-      let percentText = new Text();
-      child.add(percentText);
-      percentText.fontSize = 0.4;
-      percentText.position.z = 1.01;
-      percentText.color = "black";
-      percentText.anchorX = "center";
-      percentText.anchorY = "middle";
-      percentText.text = `${percent * 100}%`;
-    }
-  }
-});
-
-controls.addEventListener("drag", function (event) {
-  event.object.position.z = 1.1;
-});
+Drag(primaryGroup, camera, renderer.domElement, orbitControls, scene);
 
 // render the scene
 const renderloop = () => {
@@ -102,8 +51,3 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
-
-const percentCalculation = (sector) => {
-  if (sector == "house") return 0.2;
-  else return 0.7;
-};

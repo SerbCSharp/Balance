@@ -1,24 +1,47 @@
 import * as THREE from "three";
 
-export const Cube = function (sector, positionX, positionY) {
+export const Plane = function () {
+  const planeGeometry = new THREE.PlaneGeometry(28.2, 48.6);
+  const planeMaterial = new THREE.MeshBasicMaterial({
+    color: "slategrey",
+    side: THREE.DoubleSide,
+  });
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.receiveShadow = true;
+  plane.rotateZ(-0.5 * Math.PI);
+  plane.position.y = -0.82;
+  return plane;
+};
+
+export const Cube = function (sector, x, y, z) {
   const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
   const cubeMaterial = new THREE.MeshBasicMaterial({
     side: THREE.DoubleSide,
-    name: sector,
   });
   const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
   cube.receiveShadow = true;
-  cube.position.z = 1.1;
-  cube.position.x = positionX;
-  cube.position.y = positionY;
-  Building(sector);
-
+  cube.name = sector;
+  cube.position.set(x, y, z);
+  cube.material.color = ColorBuilding(sector);
   return cube;
 };
 
-const Building = function (sector) {
-  if (sector == "farmer") cube.material.color = new THREE.Color("yellow");
-  if (sector == "bakery") cube.material.color = new THREE.Color("blue");
-  if (sector == "shop") cube.material.color = new THREE.Color("red");
-  if (sector == "house") cube.material.color = new THREE.Color("green");
+export const PrimaryGroup = function () {
+  const primaryGroup = new THREE.Group();
+  const yellowCube = Cube("farmer", -26, 9, 1.1);
+  primaryGroup.add(yellowCube);
+  const blueCube = Cube("bakery", -26, 6, 1.1);
+  primaryGroup.add(blueCube);
+  const redCube = Cube("shop", -26, 3, 1.1);
+  primaryGroup.add(redCube);
+  const greenCube = Cube("house", -26, 0, 1.1);
+  primaryGroup.add(greenCube);
+  return primaryGroup;
+};
+
+export const ColorBuilding = function (sector) {
+  if (sector == "farmer") return new THREE.Color("yellow");
+  if (sector == "bakery") return new THREE.Color("blue");
+  if (sector == "shop") return new THREE.Color("red");
+  if (sector == "house") return new THREE.Color("green");
 };
